@@ -22,5 +22,7 @@ module.exports = {
         "sourceType": "module"
     },
     "rules": {
+        "semi": "off",
+        "@typescript-eslint/semi": ["error"],
     }
 };
