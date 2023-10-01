@@ -16,12 +16,12 @@ const express_1 = __importDefault(require("express"));
 const cors_1 = __importDefault(require("cors"));
 const body_parser_1 = __importDefault(require("body-parser"));
 require("./database/database");
-const operations_1 = require("./database/operations");
+const operations_1 = require("./operations");
 const app = (0, express_1.default)();
 const port = 3000;
 app.use((0, cors_1.default)());
 app.use(body_parser_1.default.json());
-app.post('/', (req, res, next) => {
+app.post('/', (req, res) => {
     return res.status(200).send('Hello world');
 });
 app.get('/getAllUsers', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -29,8 +29,22 @@ app.get('/getAllUsers', (req, res) => __awaiter(void 0, void 0, void 0, function
     return res.send(allUsers);
 }));
 app.post('/signup', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    yield (0, operations_1.createUser)(req.body);
-    return res.send('user created');
+    try {
+        yield (0, operations_1.createUser)(req.body);
+        return res.send('user created');
+    }
+    catch (e) {
+        res.status(400).send(e.detail);
+    }
+}));
+app.post('/resetPassword', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        yield (0, operations_1.resetPassword)(req.body);
+        res.send('password is updated');
+    }
+    catch (e) {
+        res.status(401).send(e.message);
+    }
 }));
 app.post('/login', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const response = yield (0, operations_1.userLogin)(req.body);

@@ -14,7 +14,7 @@ export async function execute (query: string, params?): Promise<any> {
   }
 }
 export async function createDatabase (): Promise<void> {
-  const sql = 'CREATE TABLE IF NOT EXISTS  Persons( id SERIAL PRIMARY KEY,  username VARCHAR(255) NOT NULL UNIQUE ,email VARCHAR(255) NOT NULL UNIQUE, password VARCHAR(255) NOT NULL, firstname VARCHAR(255) NOT NULL,  lastname VARCHAR(255) NOT NULL);'
+  const sql = 'CREATE TABLE IF NOT EXISTS  Persons( id SERIAL PRIMARY KEY,  username VARCHAR(255) NOT NULL UNIQUE ,email VARCHAR(255) NOT NULL UNIQUE,salt VARCHAR(255), passhash VARCHAR(255) NOT NULL, firstname VARCHAR(255) NOT NULL,  lastname VARCHAR(255) NOT NULL);'
   await execute(sql)
 }
 createDatabase().then(() => {

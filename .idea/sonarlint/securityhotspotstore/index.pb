@@ -1,18 +1,12 @@
 
-h
-8node_modules/@types/express-serve-static-core/index.d.ts,a/5/a57bdf1345293496e679eb8d1d061c9eba5c652a
 ?
 dist/app.js.map,e/b/eb03f34d0d80a381b70369ea76e9b9b06a5d3ad8
-6
-.nvmrc,c/9/c9a818aaf6a7acd6b861ec3d00d9c1e0902fd12f
 ;
 dist/app.js,e/d/ed8e06061e7f626da58b05d1c243d4c2c7193f56
 9
 	README.md,8/e/8ec9a00bfd09b3190ac6b22251dbb1aa95a0579d
 X
 (src/migrations/sql/01_initial_tables.sql,8/b/8b0d5fc3bb7e469e78a0a828a85886294b595fd6
-A
-package-lock.json,f/a/fa288d1472d29beccb489a676f68739ad365fc47
 L
 node_modules/pg/package.json,f/7/f7e68ef67106dab35c889f5db3a43bae5a81069d
 L
