@@ -1,20 +1,30 @@
 import express from 'express'
 import cors from 'cors'
 import bodyParser from 'body-parser'
+import session from 'express-session'
 import './database/database'
-import { createUser, getAllUsers, resetPassword, userLogin } from './operations'
+import {
+  checkIfLoggedIn,
+  createUser,
+  getAllUsers,
+  logoutUserFromApplication,
+  resetPassword,
+  userLogin,
+  userLoginInApplication
+} from './operations'
 
 const app = express()
 const port = 3000
 
 app.use(cors())
 app.use(bodyParser.json())
+app.use(session({
+  secret: 'something very large sentence',
+  resave: true,
+  saveUninitialized: true
+}))
 
-app.post('/', (req, res) => {
-  return res.status(200).send('Hello world')
-})
-
-app.get('/getAllUsers', async (req, res) => {
+app.get('/getAllUsers', checkIfLoggedIn, async (req: any, res) => {
   const allUsers = await getAllUsers()
   return res.send(allUsers)
 })
@@ -22,10 +32,30 @@ app.get('/getAllUsers', async (req, res) => {
 app.post('/signup', async (req, res) => {
   try {
     await createUser(req.body)
-    return res.send('user created')
+    return res.send('user created, now go to login')
   } catch (e) {
     res.status(400).send(e.detail)
   }
+})
+
+app.post('/login', async (req, res) => {
+  try {
+    const response: { allowed: boolean } = await userLoginInApplication(req)
+    if (response.allowed) {
+      res.send('login success')
+    } else {
+      res.status(401).send('Unauthorised')
+    }
+  } catch (e) {
+    if (e.code === '23505') {
+      res.status(409).send('user is already logged in')
+    }
+  }
+})
+
+app.post('/logout', checkIfLoggedIn, async (req, res) => {
+  await logoutUserFromApplication(req)
+  return res.send('logged out')
 })
 
 app.post('/resetPassword', async (req, res) => {
@@ -34,15 +64,6 @@ app.post('/resetPassword', async (req, res) => {
     res.send('password is updated')
   } catch (e) {
     res.status(401).send(e.message)
-  }
-})
-
-app.post('/login', async (req, res) => {
-  const response: { allowed: boolean } = await userLogin(req.body)
-  if (response.allowed) {
-    res.send('login success')
-  } else {
-    res.status(401).send('Unauthorised')
   }
 })
 

@@ -13,10 +13,12 @@ export async function execute (query: string, params?): Promise<any> {
     connection.release()
   }
 }
-export async function createDatabase (): Promise<void> {
-  const sql = 'CREATE TABLE IF NOT EXISTS  Persons( id SERIAL PRIMARY KEY,  username VARCHAR(255) NOT NULL UNIQUE ,email VARCHAR(255) NOT NULL UNIQUE,salt VARCHAR(255), passhash VARCHAR(255) NOT NULL, firstname VARCHAR(255) NOT NULL,  lastname VARCHAR(255) NOT NULL);'
-  await execute(sql)
+export async function createDatabases (): Promise<void> {
+  const sql1 = 'CREATE TABLE IF NOT EXISTS  Persons( id SERIAL PRIMARY KEY,  username VARCHAR(255) NOT NULL UNIQUE ,email VARCHAR(255) NOT NULL UNIQUE,salt VARCHAR(255), passhash VARCHAR(255) NOT NULL, firstname VARCHAR(255) NOT NULL,  lastname VARCHAR(255) NOT NULL);'
+  await execute(sql1)
+  const sql2 = 'CREATE TABLE IF NOT EXISTS Sessions (id SERIAL PRIMARY KEY, userid int NOT NULL UNIQUE, sessionid VARCHAR(255),FOREIGN KEY (userid) REFERENCES Persons(id))'
+  await execute(sql2)
 }
-createDatabase().then(() => {
-  console.log('Persons table created')
+createDatabases().then(() => {
+  console.log('Database created')
 })
