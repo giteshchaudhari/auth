@@ -3,15 +3,12 @@ import cors from 'cors'
 import bodyParser from 'body-parser'
 import session from 'express-session'
 import './database/database'
-import {
-  checkIfLoggedIn,
-  createUser,
-  getAllUsers,
-  logoutUserFromApplication,
-  resetPassword,
-  userLogin,
-  userLoginInApplication
-} from './operations'
+import { getAllUsers } from './operations/getAllUsers'
+import { createUser } from './operations/createUser'
+import { userLoginInApplication } from './operations/userLoginInApplication'
+import { resetPassword } from './operations/resetPassword'
+import { logoutUserFromApplication } from './operations/logoutUserFromApplication'
+import { checkIfLoggedIn } from './middleware/checkIfLoggedIn'
 
 const app = express()
 const port = 3000
@@ -58,7 +55,7 @@ app.post('/logout', checkIfLoggedIn, async (req, res) => {
   return res.send('logged out')
 })
 
-app.post('/resetPassword', async (req, res) => {
+app.post('/resetPassword', checkIfLoggedIn, async (req, res) => {
   try {
     await resetPassword(req.body)
     res.send('password is updated')
