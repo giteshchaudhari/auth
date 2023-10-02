@@ -18,19 +18,6 @@ export async function createDatabases (): Promise<void> {
   await execute(sql1)
   const sql2 = 'CREATE TABLE IF NOT EXISTS Sessions (id SERIAL PRIMARY KEY, userid int NOT NULL UNIQUE, sessionid VARCHAR(255),created_at TIMESTAMP NOT NULL DEFAULT NOW(),updated_at TIMESTAMP NOT NULL DEFAULT NOW(),FOREIGN KEY (userid) REFERENCES Persons(id))'
   await execute(sql2)
-  const sql3 = `CREATE OR REPLACE FUNCTION trigger_set_timestamp()
-          RETURNS TRIGGER AS $$
-          BEGIN
-            NEW.updated_at = NOW();
-            RETURN NEW;
-          END;
-          $$ LANGUAGE plpgsql;`
-  await execute(sql3)
-  const sql4 = `CREATE TRIGGER set_timestamp
-              BEFORE UPDATE ON Sessions
-              FOR EACH ROW
-              EXECUTE PROCEDURE trigger_set_timestamp();`
-  await execute(sql4)
 }
 createDatabases().then(() => {
   console.log('Database created')

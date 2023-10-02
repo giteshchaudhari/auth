@@ -12,6 +12,7 @@ import { resetPassword } from './operations/resetPassword'
 import { logoutUserFromApplication } from './operations/logoutUserFromApplication'
 import { checkIfLoggedIn } from './middleware/checkIfLoggedIn'
 import { deleteExpiredSessions } from './cronjob/deleteExpiredSessions'
+import { updateSession } from './middleware/updateSession'
 
 const app = express()
 const port = 3000
@@ -27,7 +28,10 @@ cron.schedule('*/15 * * * * *', async () => {
   await deleteExpiredSessions
 }, {})
 
-app.get('/getAllUsers', checkIfLoggedIn, async (req: any, res) => {
+app.get('/getAllUsers', async (req, res, next) => {
+  await checkIfLoggedIn(req, res, next)
+  await updateSession(req)
+}, async (req: any, res) => {
   const allUsers = await getAllUsers()
   return res.send(allUsers)
 })
@@ -61,7 +65,10 @@ app.post('/logout', checkIfLoggedIn, async (req, res) => {
   return res.send('logged out')
 })
 
-app.post('/resetPassword', checkIfLoggedIn, async (req, res) => {
+app.post('/resetPassword', async (req, res, next) => {
+  await checkIfLoggedIn(req, res, next)
+  await updateSession(req)
+}, async (req, res) => {
   try {
     await resetPassword(req.body)
     res.send('password is updated')
