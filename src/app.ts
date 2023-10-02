@@ -3,16 +3,18 @@ import cors from 'cors'
 import bodyParser from 'body-parser'
 import session from 'express-session'
 import './database/database'
+import cron from 'node-cron'
+
 import { getAllUsers } from './operations/getAllUsers'
 import { createUser } from './operations/createUser'
 import { userLoginInApplication } from './operations/userLoginInApplication'
 import { resetPassword } from './operations/resetPassword'
 import { logoutUserFromApplication } from './operations/logoutUserFromApplication'
 import { checkIfLoggedIn } from './middleware/checkIfLoggedIn'
+import { deleteExpiredSessions } from './cronjob/deleteExpiredSessions'
 
 const app = express()
 const port = 3000
-
 app.use(cors())
 app.use(bodyParser.json())
 app.use(session({
@@ -20,6 +22,10 @@ app.use(session({
   resave: true,
   saveUninitialized: true
 }))
+
+cron.schedule('*/15 * * * * *', async () => {
+  await deleteExpiredSessions
+}, {})
 
 app.get('/getAllUsers', checkIfLoggedIn, async (req: any, res) => {
   const allUsers = await getAllUsers()
