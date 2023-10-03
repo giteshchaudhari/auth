@@ -3,9 +3,10 @@ import cors from 'cors'
 import bodyParser from 'body-parser'
 import session from 'express-session'
 import './database/database'
+import { registerRoutes } from './routes/regesterAllRoutes'
+import './operations/getAllUsers'
 import cron from 'node-cron'
-
-import { getAllUsers } from './operations/getAllUsers'
+// import { getAllUsers } from './operations/getAllUsers'
 import { createUser } from './operations/createUser'
 import { userLoginInApplication } from './operations/userLoginInApplication'
 import { resetPassword } from './operations/resetPassword'
@@ -28,13 +29,15 @@ cron.schedule('*/15 * * * * *', async () => {
   await deleteExpiredSessions
 }, {})
 
-app.get('/getAllUsers', async (req, res, next) => {
-  await checkIfLoggedIn(req, res, next)
-  await updateSession(req)
-}, async (req: any, res) => {
-  const allUsers = await getAllUsers()
-  return res.send(allUsers)
-})
+registerRoutes(app)
+
+// app.get('/getAllUsers', async (req, res, next) => {
+//   await checkIfLoggedIn(req, res, next)
+//   await updateSession(req, res, next)
+// }, async (req: any, res) => {
+//   const allUsers = await getAllUsers()
+//   return res.send(allUsers)
+// })
 
 app.post('/signup', async (req, res) => {
   try {
@@ -47,6 +50,7 @@ app.post('/signup', async (req, res) => {
 
 app.post('/login', async (req, res) => {
   try {
+    console.log('bfvdscaxz')
     const response: { allowed: boolean } = await userLoginInApplication(req)
     if (response.allowed) {
       res.send('login success')
@@ -67,7 +71,7 @@ app.post('/logout', checkIfLoggedIn, async (req, res) => {
 
 app.post('/resetPassword', async (req, res, next) => {
   await checkIfLoggedIn(req, res, next)
-  await updateSession(req)
+  await updateSession(req, res, next)
 }, async (req, res) => {
   try {
     await resetPassword(req.body)
