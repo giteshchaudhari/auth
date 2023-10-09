@@ -2,18 +2,16 @@ import express from 'express'
 import cors from 'cors'
 import bodyParser from 'body-parser'
 import session from 'express-session'
-import './database/database'
-import { registerRoutes } from './routes/regesterAllRoutes'
-import './operations/getAllUsers'
 import cron from 'node-cron'
-// import { getAllUsers } from './operations/getAllUsers'
-import { createUser } from './operations/createUser'
-import { userLoginInApplication } from './operations/userLoginInApplication'
-import { resetPassword } from './operations/resetPassword'
-import { logoutUserFromApplication } from './operations/logoutUserFromApplication'
-import { checkIfLoggedIn } from './middleware/checkIfLoggedIn'
+import './database/database'
+import './operations/getAllUsers'
+import './operations/createUser'
+import './operations/userLoginInApplication'
+import './operations/resetPassword'
+import './operations/logoutUserFromApplication'
+
+import { registerRoutes } from './routes/regesterAllRoutes'
 import { deleteExpiredSessions } from './cronjob/deleteExpiredSessions'
-import { updateSession } from './middleware/updateSession'
 
 const app = express()
 const port = 3000
@@ -30,55 +28,6 @@ cron.schedule('*/15 * * * * *', async () => {
 }, {})
 
 registerRoutes(app)
-
-// app.get('/getAllUsers', async (req, res, next) => {
-//   await checkIfLoggedIn(req, res, next)
-//   await updateSession(req, res, next)
-// }, async (req: any, res) => {
-//   const allUsers = await getAllUsers()
-//   return res.send(allUsers)
-// })
-
-app.post('/signup', async (req, res) => {
-  try {
-    await createUser(req.body)
-    return res.send('user created, now go to login')
-  } catch (e) {
-    res.status(400).send(e.detail)
-  }
-})
-
-app.post('/login', async (req, res) => {
-  try {
-    const response: { allowed: boolean } = await userLoginInApplication(req)
-    if (response.allowed) {
-      res.send('login success')
-    } else {
-      res.status(401).send('Unauthorised')
-    }
-  } catch (e) {
-    if (e.code === '23505') {
-      res.status(409).send('user is already logged in')
-    }
-  }
-})
-
-app.post('/logout', checkIfLoggedIn, async (req, res) => {
-  await logoutUserFromApplication(req)
-  return res.send('logged out')
-})
-
-app.post('/resetPassword', async (req, res, next) => {
-  await checkIfLoggedIn(req, res, next)
-  await updateSession(req, res, next)
-}, async (req, res) => {
-  try {
-    await resetPassword(req.body)
-    res.send('password is updated')
-  } catch (e) {
-    res.status(401).send(e.message)
-  }
-})
 
 app.listen(port, () => {
   console.log('server is running on port 3000')

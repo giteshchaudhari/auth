@@ -1,5 +1,6 @@
 import { execute } from '../database/database'
 import { getHashedPassword } from './common'
+import { registerPath } from '../routes/regesterAllRoutes'
 
 export interface User {
   username: string
@@ -18,3 +19,17 @@ export async function createUser (body: User): Promise<any> {
   const results = await execute(sql, [username, salt, hashedPass, email, firstname, lastname])
   return results.rows
 }
+
+registerPath({
+  path: '/signup',
+  middleware: [],
+  method: 'post',
+  handler: async (req, res) => {
+    try {
+      await createUser(req.body)
+      return res.send('user created, now go to login')
+    } catch (e) {
+      res.status(400).send(e.detail)
+    }
+  }
+})

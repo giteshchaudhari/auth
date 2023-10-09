@@ -1,5 +1,8 @@
 import { execute } from '../database/database'
 import { getHashedPassword, userLogin } from './common'
+import { registerPath } from '../routes/regesterAllRoutes'
+import { checkIfLoggedIn } from '../middleware/checkIfLoggedIn'
+import { updateSession } from '../middleware/updateSession'
 
 export async function resetPassword (body: {
   username: string
@@ -22,3 +25,17 @@ async function updatePassword (body: { salt: string, hashedPass: string, usernam
   await execute(sql, [salt, hashedPass, username])
   return null
 }
+
+registerPath({
+  path: '/resetPassword',
+  middleware: [checkIfLoggedIn, updateSession],
+  method: 'post',
+  handler: async (req, res) => {
+    try {
+      await resetPassword(req.body)
+      res.send('password is updated')
+    } catch (e) {
+      res.status(401).send(e.message)
+    }
+  }
+})

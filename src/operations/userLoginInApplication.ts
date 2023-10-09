@@ -1,6 +1,7 @@
 import crypto from 'crypto'
 import { execute } from '../database/database'
 import { userLogin } from './common'
+import { registerPath } from '../routes/regesterAllRoutes'
 
 export async function userLoginInApplication (req): Promise<any> {
   const requestBody = req.body
@@ -27,3 +28,23 @@ async function getUserDetails (username: string): Promise<any> {
   const data = await execute(sql, [username])
   return data.rows[0]
 }
+
+registerPath({
+  path: '/login',
+  middleware: [],
+  method: 'post',
+  handler: async (req, res) => {
+    try {
+      const response: { allowed: boolean } = await userLoginInApplication(req)
+      if (response.allowed) {
+        res.send('login success')
+      } else {
+        res.status(401).send('Unauthorised')
+      }
+    } catch (e) {
+      if (e.code === '23505') {
+        res.status(409).send('user is already logged in')
+      }
+    }
+  }
+})
