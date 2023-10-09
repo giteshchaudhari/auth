@@ -50,7 +50,6 @@ app.post('/signup', async (req, res) => {
 
 app.post('/login', async (req, res) => {
   try {
-    console.log('bfvdscaxz')
     const response: { allowed: boolean } = await userLoginInApplication(req)
     if (response.allowed) {
       res.send('login success')

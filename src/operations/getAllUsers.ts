@@ -8,12 +8,10 @@ export async function getAllUsers (): Promise<any> {
   const results = await execute(sql)
   return results.rows
 }
+
 registerPath({
   path: '/getAllUsers',
-  middleware: async (req, res, next) => {
-    await checkIfLoggedIn(req, res, next)
-    await updateSession(req, res, next)
-  },
+  middleware: [checkIfLoggedIn, updateSession],
   method: 'get',
   handler: async (req: any, res) => {
     const allUsers = await getAllUsers()
