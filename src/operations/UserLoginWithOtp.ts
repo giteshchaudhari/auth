@@ -45,3 +45,5 @@ registerPath({
     }
   }
 })
+
+// revisit and start session
